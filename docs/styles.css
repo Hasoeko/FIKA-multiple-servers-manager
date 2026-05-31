@@ -1,0 +1,257 @@
+:root {
+  --bg: #0d1117;
+  --panel: #151b23;
+  --panel-2: #10161f;
+  --border: #2b3543;
+  --text: #d8e0ea;
+  --muted: #96a2b2;
+  --accent: #3fb6ff;
+  --accent-2: #5be49b;
+  --danger: #ff5f6d;
+  --warning: #ffd166;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Segoe UI", system-ui, sans-serif;
+}
+
+.page {
+  width: min(1120px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 48px 0;
+}
+
+.hero {
+  min-height: 78vh;
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(380px, 1.1fr);
+  align-items: center;
+  gap: 32px;
+}
+
+.eyebrow {
+  margin: 0 0 12px;
+  color: var(--accent-2);
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  max-width: 720px;
+  margin-bottom: 18px;
+  font-size: clamp(42px, 7vw, 78px);
+  line-height: 0.95;
+  letter-spacing: 0;
+}
+
+h2 {
+  margin-bottom: 10px;
+  font-size: 20px;
+}
+
+.lead {
+  max-width: 620px;
+  color: var(--muted);
+  font-size: 18px;
+  line-height: 1.6;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 26px;
+}
+
+.button {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text);
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.button.primary {
+  color: #05130d;
+  background: var(--accent-2);
+  border-color: var(--accent-2);
+}
+
+.preview,
+.features article,
+.quick-start,
+.notes {
+  border: 1px solid var(--border);
+  background: var(--panel);
+  border-radius: 8px;
+}
+
+.preview {
+  overflow: hidden;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+}
+
+.preview-top {
+  height: 38px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 14px;
+  border-bottom: 1px solid var(--border);
+  background: var(--panel-2);
+}
+
+.preview-top span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--muted);
+}
+
+.preview-controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  padding: 14px;
+}
+
+.preview-controls button {
+  min-height: 38px;
+  color: #071018;
+  background: var(--accent);
+  border: 0;
+  border-radius: 6px;
+  font: inherit;
+  font-weight: 700;
+}
+
+.preview-controls .danger {
+  background: var(--danger);
+}
+
+.preview-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  border-top: 1px solid var(--border);
+  background: var(--border);
+}
+
+.preview-grid div {
+  min-height: 220px;
+  padding: 14px;
+  background: #090d13;
+  font: 13px/1.5 Consolas, "Cascadia Mono", monospace;
+}
+
+.preview-grid strong {
+  display: block;
+  margin-bottom: 14px;
+  color: var(--text);
+  font-family: "Segoe UI", system-ui, sans-serif;
+}
+
+.preview-grid p {
+  margin-bottom: 8px;
+  color: var(--muted);
+}
+
+.preview-grid .warn {
+  color: var(--warning);
+}
+
+.preview-grid .ok {
+  color: var(--accent-2);
+}
+
+.features {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 22px;
+}
+
+.features article,
+.notes {
+  padding: 18px;
+}
+
+.features p,
+.notes p,
+.quick-start p {
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.quick-start {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(320px, 1.2fr);
+  gap: 18px;
+  align-items: center;
+  margin-top: 14px;
+  padding: 18px;
+}
+
+pre {
+  min-width: 0;
+  margin: 0;
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: #090d13;
+  padding: 14px;
+}
+
+code {
+  color: var(--text);
+  font-family: Consolas, "Cascadia Mono", monospace;
+}
+
+.notes {
+  margin-top: 14px;
+}
+
+@media (max-width: 860px) {
+  .page {
+    padding-top: 28px;
+  }
+
+  .hero,
+  .features,
+  .quick-start {
+    grid-template-columns: 1fr;
+  }
+
+  .hero {
+    min-height: auto;
+  }
+
+  .preview-grid,
+  .preview-controls {
+    grid-template-columns: 1fr;
+  }
+}

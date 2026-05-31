@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FIKA Multiple Servers Manager</title>
+  <meta name="description" content="A small LAN web controller for managing single-player and coop SPT/FIKA servers with a shared headless client.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">SPT / FIKA LAN Tool</p>
+        <h1>FIKA Multiple Servers Manager</h1>
+        <p class="lead">
+          A lightweight local web controller for launching a single-player SPT server, a coop FIKA server, and one shared headless client from another PC on your network.
+        </p>
+        <div class="actions">
+          <a href="https://github.com/Hasoeko/FIKA-multiple-servers-manager" class="button primary">View on GitHub</a>
+          <a href="#quick-start" class="button">Quick Start</a>
+        </div>
+      </div>
+
+      <div class="preview" aria-label="Dashboard preview">
+        <div class="preview-top">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <div class="preview-controls">
+          <button>Launch SP + Headless</button>
+          <button>Launch Coop + Headless</button>
+          <button>Restart</button>
+          <button class="danger">Stop</button>
+        </div>
+        <div class="preview-grid">
+          <div>
+            <strong>Server Log</strong>
+            <p class="warn">[WARN] Mod version mismatch</p>
+            <p>[INFO] Server ready on 127.0.0.1:6969</p>
+            <p class="ok">[OK] Headless connected</p>
+          </div>
+          <div>
+            <strong>BepInEx Log</strong>
+            <p>[INFO] Loading plugins</p>
+            <p class="warn">[WARN] Optional dependency missing</p>
+            <p>[INFO] Session active</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="features">
+      <article>
+        <h2>Server Control</h2>
+        <p>Launch SP or coop mode, restart the full stack, restart only the headless client, or stop everything from the browser.</p>
+      </article>
+      <article>
+        <h2>Live Logs</h2>
+        <p>Watch the newest SPT server log and BepInEx log side by side, with warning and error lines colored for scanning.</p>
+      </article>
+      <article>
+        <h2>File Access</h2>
+        <p>Browse both EFT folders, upload files, move files to trash, search the current folder, and edit text files in the browser.</p>
+      </article>
+    </section>
+
+    <section id="quick-start" class="quick-start">
+      <div>
+        <h2>Quick Start</h2>
+        <p>Run the web controller on the machine that hosts the SPT/FIKA installs, then open the configured port from another PC on the same network.</p>
+      </div>
+      <pre><code>C:\Games\EscapeFromTarkov\Web Server\Start-SPT-Web-Control.cmd</code></pre>
+    </section>
+
+    <section class="notes">
+      <h2>Local Use Notes</h2>
+      <p>
+        This tool is intended for trusted LAN use. Change the default password in <code>Web Server\config.json</code>, keep the port private, and avoid exposing it directly to the internet.
+      </p>
+    </section>
+  </main>
+</body>
+</html>
