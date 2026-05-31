@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SPT Web Control</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <main class="shell">
+    <section class="topbar">
+      <div class="brand">
+        <h1>SPT Web Control</h1>
+        <div id="statusText" class="status">Locked</div>
+      </div>
+
+      <form id="loginForm" class="login">
+        <input id="passwordInput" type="password" autocomplete="current-password" placeholder="Password">
+        <button type="submit">Unlock</button>
+      </form>
+
+      <div id="controls" class="controls hidden">
+        <button type="button" class="tab-button active" data-tab="control">Control</button>
+        <button type="button" class="tab-button" data-tab="files">Files</button>
+        <button data-action="launch-single">Launch SP + Headless</button>
+        <button data-action="launch-coop">Launch Coop + Headless</button>
+        <button data-action="restart-all">Restart Server + Headless</button>
+        <button data-action="restart-headless">Restart Headless</button>
+        <button data-action="stop-all" class="danger">Stop Server + Headless</button>
+      </div>
+    </section>
+
+    <section id="controlView" class="view active">
+      <section class="meta">
+        <div><span>Mode</span><strong id="modeValue">-</strong></div>
+        <div><span>Server</span><strong id="serverValue">-</strong></div>
+        <div><span>Headless</span><strong id="headlessValue">-</strong></div>
+        <div><span>Port 6969</span><strong id="portValue">-</strong></div>
+      </section>
+
+      <section class="logs">
+        <article class="panel">
+          <header>
+            <h2>Server Log</h2>
+            <span id="serverLogPath"></span>
+          </header>
+          <pre id="serverLog" class="log"></pre>
+        </article>
+
+        <article class="panel">
+          <header>
+            <h2>BepInEx Log</h2>
+            <span id="bepinexLogPath"></span>
+          </header>
+          <pre id="bepinexLog" class="log"></pre>
+        </article>
+      </section>
+    </section>
+
+    <section id="filesView" class="view">
+      <section class="file-toolbar">
+        <button type="button" class="root-toggle active" data-root-toggle="sp">SP</button>
+        <button type="button" class="root-toggle active" data-root-toggle="coop">Coop</button>
+        <span id="fileMessage" class="file-path"></span>
+      </section>
+
+      <section id="fileManager" class="file-manager split-both">
+        <article id="spPane" class="panel file-list-panel" data-root-pane="sp">
+          <header>
+            <h2>EFT SP</h2>
+            <span id="spFilePath"></span>
+          </header>
+          <div class="pane-toolbar">
+            <button type="button" data-file-up="sp">Up</button>
+            <label class="upload-button">
+              Upload
+              <input type="file" multiple data-file-upload="sp">
+            </label>
+            <input type="search" placeholder="Search current folder" data-file-search="sp">
+          </div>
+          <div id="spFileList" class="file-list" data-file-list="sp"></div>
+        </article>
+
+        <article id="coopPane" class="panel file-list-panel" data-root-pane="coop">
+          <header>
+            <h2>EFT Coop</h2>
+            <span id="coopFilePath"></span>
+          </header>
+          <div class="pane-toolbar">
+            <button type="button" data-file-up="coop">Up</button>
+            <label class="upload-button">
+              Upload
+              <input type="file" multiple data-file-upload="coop">
+            </label>
+            <input type="search" placeholder="Search current folder" data-file-search="coop">
+          </div>
+          <div id="coopFileList" class="file-list" data-file-list="coop"></div>
+        </article>
+
+        <article class="panel editor-panel">
+          <header>
+            <h2 id="editorTitle">Editor</h2>
+            <div class="editor-actions">
+              <button type="button" id="editorSave">Save</button>
+              <button type="button" id="editorClose">Close</button>
+            </div>
+          </header>
+          <textarea id="fileEditor" spellcheck="false" disabled></textarea>
+        </article>
+      </section>
+    </section>
+  </main>
+
+  <script src="/app.js"></script>
+</body>
+</html>

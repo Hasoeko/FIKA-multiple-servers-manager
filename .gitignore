@@ -1,0 +1,17 @@
+# Game/SPT installs: keep these out of git.
+/EscapeFromTarkov/
+/EFT coop/
+/mods/
+
+# Runtime state and local secrets/settings.
+/Web Server/state.json
+/Web Server/config.json
+/Web Server/Trash/
+
+# Logs and transient files.
+*.log
+*.tmp
+*.bak
+*.old
+Thumbs.db
+desktop.ini
