@@ -123,6 +123,22 @@ try {
     Assert-Equal $listing.items[1].name 'editable.txt' 'Editable files should appear before uneditable files.'
     Assert-Equal $listing.items[2].name 'binary.dll' 'Uneditable files should appear at the bottom.'
 
+    $uploadContent = [System.Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes('nested upload'))
+    $uploadResult = Save-SptUploadedFile -RootKey 'sp' -RelativePath $realListTestName -FileName 'settings.json' -UploadRelativePath 'folder-upload\nested\settings.json' -ContentBase64 $uploadContent
+    $uploadedPath = Join-Path $realListTestDir 'folder-upload\nested\settings.json'
+    Assert-True (Test-Path -LiteralPath $uploadedPath -PathType Leaf) 'Folder upload should create nested folders.'
+    Assert-Equal (Get-Content -LiteralPath $uploadedPath -Raw).Trim() 'nested upload' 'Nested uploaded file content mismatch.'
+    Assert-Equal $uploadResult.path (Join-Path $realListTestName 'folder-upload\nested\settings.json') 'Nested uploaded relative path mismatch.'
+
+    $uploadTraversalRejected = $false
+    try {
+        Save-SptUploadedFile -RootKey 'sp' -RelativePath $realListTestName -FileName 'bad.txt' -UploadRelativePath '..\bad.txt' -ContentBase64 $uploadContent | Out-Null
+    }
+    catch {
+        $uploadTraversalRejected = $true
+    }
+    Assert-True $uploadTraversalRejected 'Upload folder paths should reject traversal.'
+
     $fileRoot = Join-Path $tempRoot 'managed-root'
     New-Item -ItemType Directory -Path $fileRoot | Out-Null
     $safePath = Resolve-SptManagedPath -RootPath $fileRoot -RelativePath 'user\mods\config.json'

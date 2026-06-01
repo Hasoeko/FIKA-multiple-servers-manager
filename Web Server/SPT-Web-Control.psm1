@@ -226,6 +226,9 @@ function Save-SptUploadedFile {
         [Parameter(Mandatory = $true)]
         [string]$FileName,
 
+        [AllowEmptyString()]
+        [string]$UploadRelativePath = '',
+
         [Parameter(Mandatory = $true)]
         [string]$ContentBase64
     )
@@ -239,11 +242,40 @@ function Save-SptUploadedFile {
         throw 'Upload folder not found.'
     }
 
-    $targetRelativePath = $FileName
+    if ([string]::IsNullOrWhiteSpace($UploadRelativePath)) {
+        $UploadRelativePath = $FileName
+    }
+
+    if ([System.IO.Path]::IsPathRooted($UploadRelativePath)) {
+        throw 'Absolute upload paths are not allowed.'
+    }
+
+    $segments = @($UploadRelativePath -split '[\\/]+' | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
+    if ($segments.Count -eq 0) {
+        throw 'Upload path is empty.'
+    }
+
+    foreach ($segment in $segments) {
+        if ($segment -eq '.' -or $segment -eq '..' -or $segment -match '[\\/:*?"<>|]') {
+            throw 'Upload path contains invalid characters.'
+        }
+    }
+
+    $safeUploadRelativePath = $segments[0]
+    for ($index = 1; $index -lt $segments.Count; $index++) {
+        $safeUploadRelativePath = Join-Path $safeUploadRelativePath $segments[$index]
+    }
+
+    $targetRelativePath = $safeUploadRelativePath
     if (-not [string]::IsNullOrWhiteSpace($RelativePath)) {
-        $targetRelativePath = Join-Path $RelativePath $FileName
+        $targetRelativePath = Join-Path $RelativePath $safeUploadRelativePath
     }
     $targetPath = Resolve-SptManagedPath -RootPath (Get-SptFileRootPath -RootKey $RootKey) -RelativePath $targetRelativePath
+    $targetFolder = [System.IO.Path]::GetDirectoryName($targetPath)
+    if (-not (Test-Path -LiteralPath $targetFolder -PathType Container)) {
+        New-Item -ItemType Directory -Path $targetFolder -Force | Out-Null
+    }
+
     $bytes = [System.Convert]::FromBase64String($ContentBase64)
     [System.IO.File]::WriteAllBytes($targetPath, $bytes)
 

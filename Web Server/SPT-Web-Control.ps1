@@ -283,7 +283,12 @@ function Handle-ApiRequest {
                 }
 
                 $body = $Request.Body | ConvertFrom-Json
-                $result = Save-SptUploadedFile -RootKey ([string]$body.root) -RelativePath ([string]$body.path) -FileName ([string]$body.name) -ContentBase64 ([string]$body.contentBase64)
+                $uploadRelativePath = [string]$body.name
+                if ($null -ne $body.PSObject.Properties['relativePath'] -and -not [string]::IsNullOrWhiteSpace([string]$body.relativePath)) {
+                    $uploadRelativePath = [string]$body.relativePath
+                }
+
+                $result = Save-SptUploadedFile -RootKey ([string]$body.root) -RelativePath ([string]$body.path) -FileName ([string]$body.name) -UploadRelativePath $uploadRelativePath -ContentBase64 ([string]$body.contentBase64)
                 Write-Json -Stream $Request.Stream -StatusCode 200 -StatusText 'OK' -Value @{
                     ok = $true
                     file = $result

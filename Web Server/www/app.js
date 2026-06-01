@@ -330,10 +330,97 @@ function fileToBase64(file) {
   });
 }
 
-async function uploadFiles(root, files) {
+function normalizeUploadPath(path, fallbackName) {
+  const rawPath = String(path || fallbackName || "").replaceAll("\\", "/");
+  const parts = rawPath.split("/").filter((part) => part && part !== ".");
+  if (parts.length === 0 || parts.some((part) => part === "..")) {
+    throw new Error("Upload path is invalid.");
+  }
+  return parts.join("/");
+}
+
+function normalizeUploads(filesOrUploads) {
+  return Array.from(filesOrUploads || []).map((item) => {
+    const file = item.file || item;
+    return {
+      file,
+      relativePath: normalizeUploadPath(item.relativePath || file.webkitRelativePath || file.name, file.name),
+    };
+  });
+}
+
+function entryToFile(entry) {
+  return new Promise((resolve, reject) => {
+    entry.file(resolve, reject);
+  });
+}
+
+function readDirectoryEntries(reader) {
+  return new Promise((resolve, reject) => {
+    const entries = [];
+    const readBatch = () => {
+      reader.readEntries((batch) => {
+        if (batch.length === 0) {
+          resolve(entries);
+          return;
+        }
+
+        entries.push(...batch);
+        readBatch();
+      }, reject);
+    };
+
+    readBatch();
+  });
+}
+
+async function collectEntryUploads(entry, prefix = "") {
+  if (entry.isFile) {
+    const file = await entryToFile(entry);
+    return [{
+      file,
+      relativePath: normalizeUploadPath(prefix ? `${prefix}/${file.name}` : file.name, file.name),
+    }];
+  }
+
+  if (!entry.isDirectory) {
+    return [];
+  }
+
+  const directoryPrefix = prefix ? `${prefix}/${entry.name}` : entry.name;
+  const children = await readDirectoryEntries(entry.createReader());
+  const uploads = [];
+  for (const child of children) {
+    uploads.push(...await collectEntryUploads(child, directoryPrefix));
+  }
+  return uploads;
+}
+
+async function collectDroppedUploads(dataTransfer) {
+  const items = Array.from(dataTransfer?.items || []);
+  const entryUploads = [];
+
+  for (const item of items) {
+    if (item.kind !== "file" || typeof item.webkitGetAsEntry !== "function") continue;
+    const entry = item.webkitGetAsEntry();
+    if (entry) {
+      entryUploads.push(...await collectEntryUploads(entry));
+    }
+  }
+
+  if (entryUploads.length > 0) {
+    return entryUploads;
+  }
+
+  return normalizeUploads(Array.from(dataTransfer?.files || []));
+}
+
+async function uploadFiles(root, filesOrUploads) {
   try {
-    for (const file of files) {
-      setFileMessage(`Uploading ${file.name} to ${rootLabel(root)}...`);
+    const uploads = normalizeUploads(filesOrUploads);
+    for (let index = 0; index < uploads.length; index++) {
+      const { file, relativePath } = uploads[index];
+      setFileMessage(`Uploading ${index + 1}/${uploads.length}: ${relativePath}`);
       const contentBase64 = await fileToBase64(file);
       await api("/api/files/upload", {
         method: "POST",
@@ -341,11 +428,12 @@ async function uploadFiles(root, files) {
           root,
           path: state.roots[root].path,
           name: file.name,
+          relativePath,
           contentBase64,
         }),
       });
     }
-    setFileMessage("Upload complete.");
+    setFileMessage(`Upload complete: ${uploads.length} file(s).`);
     await loadFiles(root);
   } catch (error) {
     setFileMessage(error.message);
@@ -441,6 +529,17 @@ document.querySelectorAll("[data-file-upload]").forEach((input) => {
   });
 });
 
+document.querySelectorAll("[data-folder-upload]").forEach((input) => {
+  input.addEventListener("change", async () => {
+    const root = input.dataset.folderUpload;
+    const files = Array.from(input.files || []);
+    input.value = "";
+    if (files.length > 0) {
+      await uploadFiles(root, files);
+    }
+  });
+});
+
 document.querySelectorAll("[data-file-search]").forEach((input) => {
   input.addEventListener("input", () => {
     const root = input.dataset.fileSearch;
@@ -455,7 +554,7 @@ document.querySelectorAll("[data-file-list]").forEach((list) => {
       preventDefault(event);
       if (state.activeTab === "files") {
         list.classList.add("drag-over");
-        setFileMessage(`Drop files to upload to ${rootLabel(list.dataset.fileList)}.`);
+        setFileMessage(`Drop files or folders to upload to ${rootLabel(list.dataset.fileList)}.`);
       }
     });
   });
@@ -469,9 +568,9 @@ document.querySelectorAll("[data-file-list]").forEach((list) => {
 
   list.addEventListener("drop", async (event) => {
     const root = list.dataset.fileList;
-    const files = Array.from(event.dataTransfer?.files || []);
-    if (files.length > 0) {
-      await uploadFiles(root, files);
+    const uploads = await collectDroppedUploads(event.dataTransfer);
+    if (uploads.length > 0) {
+      await uploadFiles(root, uploads);
     }
   });
 
